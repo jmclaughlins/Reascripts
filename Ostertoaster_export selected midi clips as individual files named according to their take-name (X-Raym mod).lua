@@ -10,8 +10,15 @@ end
 
 function GetCC(take, cc)
 	return cc.selected, cc.muted, cc.ppqpos, cc.chanmsg, cc.chan, cc.msg2, cc.msg3
-end
+end    
 
+function checkiffile_exists(name) 
+	local f =io.open(name, "r")
+	if f~=nil then io.close(f)return true 
+	else return false 
+	end
+	end 
+				
 function main() -- local (i, j, item, take, track)
 	typebuf = ""
 	initialFolder = reaper.GetExtState("export selected midi clips folder", 0)
@@ -29,7 +36,24 @@ function main() -- local (i, j, item, take, track)
 		cur_take = reaper.GetMediaItemInfo_Value(item, "I_CURTAKE")
 		take = reaper.GetTake(item, cur_take)
 		take_name = reaper.GetTakeName(take)
+		doesexist = checkiffile_exists(initialFolder .. "/" .. take_name ..".mid")
+		if (take_name == currName)
+		then 
+		fn = initialFolder .. "/" .. take_name ..i.. ".mid" 
+		else
 		fn = initialFolder .. "/" .. take_name .. ".mid"
+		end 
+		
+		while (doesexist == true) 
+		do 
+		fn = initialFolder .. "/" .. take_name ..i.. ".mid"
+		doesexist = checkiffile_exists(fn)
+		i = i+1 
+		end 
+		
+		--if take_name == take_name then fn now equals take_name + i
+		currName = take_name                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   
+		-- ADD IN FAIL SAVE HERE (if check) 
 		src = reaper.GetMediaItemTake_Source(take)
 		typebuf = reaper.GetMediaSourceType(src, typebuf)
 		if typebuf ~= "MIDI" then reaper.MB("This only works on midi items.", "wrong item type", 0); goto exit end
